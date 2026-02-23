@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silla de Ruedas Interactiva</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        model-viewer {
+            width: 100%;
+            height: 100vh;
+            background-color: #ffffff;
+        }
+
+        /* ESTILO DE LOS PUNTOS VERDES */
+        .Hotspot {
+            background: #78bb1e; /* El color verde que pediste */
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Efecto cuando el mouse pasa por encima */
+        .Hotspot:hover {
+            transform: scale(1.3);
+            background: #5d9117; /* Un verde un poco más oscuro al pasar el mouse */
+        }
+
+        /* Ocultar puntos cuando quedan "detrás" del modelo */
+        .Hotspot:not([data-visible]) {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ESTILO DE LAS ETIQUETAS DE TEXTO */
+        .HotspotAnnotation {
+            background: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            color: #1a1a1a;
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 14px;
+            position: absolute;
+            left: 28px;
+            top: -12px;
+            width: max-content;
+            pointer-events: none;
+            border-left: 4px solid #78bb1e; /* Línea verde lateral en la etiqueta */
+        }
+
+        /* Ajustes para Realidad Aumentada */
+        #ar-button {
+            background-color: #fff;
+            border-radius: 8px;
+            border: 1px solid #78bb1e;
+            padding: 10px 20px;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<model-viewer 
+    src="silla.glb" 
+    ar 
+    ar-modes="webxr scene-viewer quick-look" 
+    camera-controls 
+    tone-mapping="neutral" 
+    poster="poster.webp" 
+    shadow-intensity="1"
+    auto-rotate>
+
+    <button class="Hotspot" slot="hotspot-1" data-position="-0.09332456801273255m 0.12400364438353279m -0.4927209796221662m" data-normal="0m 0.3363381710606559m -0.9417412779992036m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Reposapiés</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-2" data-position="-0.040418068409104904m 0.4167843732448788m 0.007272002273381373m" data-normal="0.07448182315951603m 0.9972223713990822m -1.5963240223026113e-7m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Asiento</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-3" data-position="-0.01257929406573853m 0.6446059689421607m 0.2095687491646194m" data-normal="0.01741564256496317m -3.4541692761645676e-7m -0.9998483361960104m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Respaldo</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-4" data-position="0.22749054791245238m 0.7220691944545161m -0.06611131922087629m" data-normal="0.7132342956414052m 0.7009110125638959m -0.004537839525933149m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Reposabrazos</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-5" data-position="0.2292297190985983m 0.8409113687117691m 0.2627824673341663m" data-normal="0.9650503230574928m 0.26206459251770803m 0.00015269301369995818m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Mangos de empuje</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-6" data-position="0.21104283665425463m 0.07647062913719621m -0.25155008690059094m" data-normal="-0.06767898938103496m 0.9391840904366718m -0.3366790736992768m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Ruedas delanteras giratorias</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-7" data-position="-0.2520459276549373m 0.49209902603090194m 0.3332633420848593m" data-normal="-0.989392530002313m -0.11667609424937145m -0.08653964759770136m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Ruedas traseras propulsoras</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-9" data-position="-0.001054999205862911m 0.2716771271386193m -0.0356065672817322m" data-normal="0m -1.629206789477422e-7m -0.9999999999999868m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Barras de cruceta</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-11" data-position="-0.24218817026552897m 0.24862377825332332m 0.2010077565139363m" data-normal="-0.3513197061155127m 0.46812780639368634m 0.8108210782755622m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Aros propulsores</div>
+    </button>
+
+    <button class="Hotspot" slot="hotspot-12" data-position="0.220875972918911m 0.1114904312306127m 0.2693615552287887m" data-normal="0.9659263615970368m -0.25881704729771726m 4.2166649068994566e-8m" data-visibility-attribute="visible">
+        <div class="HotspotAnnotation">Barras de inclinación</div>
+    </button>
+
+    <div class="progress-bar hide" slot="progress-bar">
+        <div class="update-bar"></div>
+    </div>
+    
+    <button slot="ar-button" id="ar-button">Ver en mi espacio (AR)</button>
+
+</model-viewer>
+
+</body>
+</html>
