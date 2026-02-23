@@ -3,132 +3,738 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silla de Ruedas Interactiva</title>
+    <title>Silla de Ruedas — Guía Interactiva</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    
     <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
+        :root {
+            --verde-primario: #22c55e;
+            --verde-oscuro:   #15803d;
+            --verde-suave:    #bbf7d0;
+            --verde-fondo:    #f0fdf4;
+            --verde-borde:    #86efac;
+            --blanco:         #ffffff;
+            --gris-100:       #f8fafc;
+            --gris-200:       #e2e8f0;
+            --gris-400:       #94a3b8;
+            --gris-700:       #334155;
+            --texto:          #0f2d1c;
+            --texto-suave:    #4b6b5a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--blanco);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: var(--texto);
+        }
+
+        /* ── TOP BAR ── */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 28px;
+            background: var(--blanco);
+            border-bottom: 1px solid var(--gris-200);
+            flex-shrink: 0;
+            z-index: 30;
+        }
+
+        .top-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--texto);
+            letter-spacing: -0.01em;
+        }
+
+        .top-title span {
+            color: var(--verde-primario);
+        }
+
+        .part-counter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--texto-suave);
+            font-weight: 500;
+        }
+
+        .counter-pill {
+            background: var(--verde-fondo);
+            border: 1px solid var(--verde-borde);
+            color: var(--verde-oscuro);
+            font-weight: 700;
+            font-size: 0.78rem;
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+
+        .ar-btn-top {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--verde-primario);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 8px 18px;
+            border-radius: 99px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 12px rgba(34,197,94,0.25);
+        }
+
+        .ar-btn-top:hover {
+            background: var(--verde-oscuro);
+            box-shadow: 0 4px 18px rgba(34,197,94,0.35);
+            transform: translateY(-1px);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        .main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            overflow: hidden;
+        }
+
+        /* ── 3D VIEWER ── */
+        .viewer-wrap {
+            position: relative;
+            background: #f8fff9;
+            /* subtle dot grid */
+            background-image: radial-gradient(circle, #c8efd4 1px, transparent 1px);
+            background-size: 28px 28px;
+            overflow: hidden;
+        }
+
+        /* Soft green gradient vignette */
+        .viewer-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(240,253,244,0.7) 100%);
+            pointer-events: none;
+        }
+
         model-viewer {
             width: 100%;
-            height: 100vh;
-            background-color: #ffffff;
+            height: 100%;
+            --poster-color: transparent;
+            background-color: transparent;
         }
 
-        /* ESTILO DE LOS PUNTOS VERDES */
+        /* ── HOTSPOTS ── */
         .Hotspot {
-            background: #78bb1e; /* El color verde que pediste */
+            background: var(--verde-primario);
             border-radius: 50%;
-            border: 2px solid #ffffff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            width: 20px;
-            height: 20px;
+            border: 3px solid white;
+            box-shadow: 0 0 0 0 rgba(34,197,94,0.5), 0 2px 8px rgba(0,0,0,0.12);
+            width: 22px;
+            height: 22px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275), background 0.2s;
+            animation: hotspot-pulse 2.5s infinite;
         }
 
-        /* Efecto cuando el mouse pasa por encima */
-        .Hotspot:hover {
-            transform: scale(1.3);
-            background: #5d9117; /* Un verde un poco más oscuro al pasar el mouse */
+        .Hotspot:hover, .Hotspot.activo {
+            transform: scale(1.4);
+            background: var(--verde-oscuro);
+            animation: none;
+            box-shadow: 0 0 0 6px rgba(34,197,94,0.2), 0 4px 14px rgba(0,0,0,0.15);
         }
 
-        /* Ocultar puntos cuando quedan "detrás" del modelo */
         .Hotspot:not([data-visible]) {
             opacity: 0;
             pointer-events: none;
         }
 
-        /* ESTILO DE LAS ETIQUETAS DE TEXTO */
-        .HotspotAnnotation {
-            background: #ffffff;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            color: #1a1a1a;
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 14px;
-            position: absolute;
-            left: 28px;
-            top: -12px;
-            width: max-content;
-            pointer-events: none;
-            border-left: 4px solid #78bb1e; /* Línea verde lateral en la etiqueta */
+        @keyframes hotspot-pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(34,197,94,0.5), 0 2px 8px rgba(0,0,0,0.12); }
+            60%  { box-shadow: 0 0 0 10px rgba(34,197,94,0),  0 2px 8px rgba(0,0,0,0.12); }
+            100% { box-shadow: 0 0 0 0 rgba(34,197,94,0),    0 2px 8px rgba(0,0,0,0.12); }
         }
 
-        /* Ajustes para Realidad Aumentada */
-        #ar-button {
-            background-color: #fff;
-            border-radius: 8px;
-            border: 1px solid #78bb1e;
-            padding: 10px 20px;
+        .HotspotAnnotation {
+            font-family: 'Syne', sans-serif;
+            font-size: 11.5px;
+            font-weight: 700;
+            background: white;
+            color: var(--texto);
+            padding: 5px 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--verde-primario);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            left: 30px;
+            top: -13px;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 0.01em;
+        }
+
+        /* ── SIDE PANEL ── */
+        .side-panel {
+            background: var(--blanco);
+            border-left: 1px solid var(--gris-200);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Panel header */
+        .panel-header {
+            padding: 22px 24px 16px;
+            border-bottom: 1px solid var(--gris-200);
+            flex-shrink: 0;
+        }
+
+        .panel-header-label {
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--verde-primario);
+            margin-bottom: 6px;
+        }
+
+        .panel-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--texto);
+        }
+
+        /* Parts list */
+        .parts-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 16px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--verde-borde) transparent;
+        }
+
+        .part-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid transparent;
             cursor: pointer;
+            transition: all 0.22s;
+            margin-bottom: 6px;
+        }
+
+        .part-item:hover {
+            background: var(--verde-fondo);
+            border-color: var(--verde-borde);
+        }
+
+        .part-item.activo {
+            background: var(--verde-fondo);
+            border-color: var(--verde-primario);
+        }
+
+        .part-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--gris-100);
+            border: 1.5px solid var(--gris-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gris-400);
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .part-item.activo .part-num,
+        .part-item:hover .part-num {
+            background: var(--verde-primario);
+            border-color: var(--verde-primario);
+            color: white;
+        }
+
+        .part-info { flex: 1; }
+
+        .part-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--texto);
+            margin-bottom: 2px;
+        }
+
+        .part-summary {
+            font-size: 0.76rem;
+            color: var(--gris-400);
+            line-height: 1.4;
+        }
+
+        .part-item.activo .part-summary { color: var(--texto-suave); }
+
+        .part-arrow {
+            font-size: 0.8rem;
+            color: var(--gris-200);
+            align-self: center;
+            transition: color 0.2s;
+        }
+
+        .part-item:hover .part-arrow,
+        .part-item.activo .part-arrow { color: var(--verde-primario); }
+
+        /* ── DETAIL DRAWER ── */
+        .detail-drawer {
+            position: fixed;
+            bottom: 0; left: 0; right: 360px;
+            background: white;
+            border-top: 1px solid var(--gris-200);
+            border-right: 1px solid var(--gris-200);
+            padding: 0;
+            transform: translateY(100%);
+            transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+            z-index: 40;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.08);
+            max-height: 42vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-drawer.open { transform: translateY(0); }
+
+        .drawer-handle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gris-200);
+            flex-shrink: 0;
+        }
+
+        .drawer-part-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--texto);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .drawer-part-name::before {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--verde-primario);
+            flex-shrink: 0;
+        }
+
+        .close-drawer {
+            background: var(--gris-100);
+            border: 1px solid var(--gris-200);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--gris-400);
+            transition: all 0.2s;
+        }
+        .close-drawer:hover { background: #fee2e2; border-color: #fca5a5; color: #ef4444; }
+
+        .drawer-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        .detail-card {
+            background: var(--gris-100);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--gris-200);
+        }
+
+        .detail-card-label {
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--verde-oscuro);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-card p {
+            font-size: 0.84rem;
+            line-height: 1.6;
+            color: var(--texto-suave);
+        }
+
+        .detail-card.highlight {
+            background: var(--verde-fondo);
+            border-color: var(--verde-borde);
+        }
+
+        .detail-card.highlight p { color: var(--texto); }
+
+        /* ── BOTTOM STATUS ── */
+        .status-bar {
+            background: var(--gris-100);
+            border-top: 1px solid var(--gris-200);
+            padding: 8px 28px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            font-size: 0.72rem;
+            color: var(--gris-400);
+        }
+
+        .status-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--verde-primario);
+            box-shadow: 0 0 6px var(--verde-primario);
+            flex-shrink: 0;
+        }
+
+        .status-item { display: flex; align-items: center; gap: 6px; }
+
+        .status-selected {
+            margin-left: auto;
+            color: var(--verde-oscuro);
+            font-weight: 600;
+        }
+
+        /* ── WELCOME HINT ── */
+        .viewer-hint {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--verde-borde);
+            color: var(--texto-suave);
+            font-size: 0.78rem;
+            padding: 9px 18px;
+            border-radius: 99px;
+            z-index: 10;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+            animation: fadeSlideUp 0.6s 1s both;
+            pointer-events: none;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes slideInCard {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-card { animation: slideInCard 0.4s both; }
+        .detail-card:nth-child(2) { animation-delay: 0.07s; }
+        .detail-card:nth-child(3) { animation-delay: 0.14s; }
+
+        @media (max-width: 800px) {
+            .main { grid-template-columns: 1fr; }
+            .side-panel { display: none; }
+            .detail-drawer { right: 0; }
+            .drawer-body { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<model-viewer 
-    src="silla.glb" 
-    ar 
-    ar-modes="webxr scene-viewer quick-look" 
-    camera-controls 
-    tone-mapping="neutral" 
-    poster="poster.webp" 
-    shadow-intensity="1"
-    auto-rotate>
+<!-- ── TOP BAR ── -->
+<div class="top-bar">
+    <span class="top-title">Silla de Ruedas — <span>Guía de Componentes</span></span>
 
-    <button class="Hotspot" slot="hotspot-1" data-position="-0.09332456801273255m 0.12400364438353279m -0.4927209796221662m" data-normal="0m 0.3363381710606559m -0.9417412779992036m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Reposapiés</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-2" data-position="-0.040418068409104904m 0.4167843732448788m 0.007272002273381373m" data-normal="0.07448182315951603m 0.9972223713990822m -1.5963240223026113e-7m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Asiento</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-3" data-position="-0.01257929406573853m 0.6446059689421607m 0.2095687491646194m" data-normal="0.01741564256496317m -3.4541692761645676e-7m -0.9998483361960104m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Respaldo</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-4" data-position="0.22749054791245238m 0.7220691944545161m -0.06611131922087629m" data-normal="0.7132342956414052m 0.7009110125638959m -0.004537839525933149m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Reposabrazos</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-5" data-position="0.2292297190985983m 0.8409113687117691m 0.2627824673341663m" data-normal="0.9650503230574928m 0.26206459251770803m 0.00015269301369995818m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Mangos de empuje</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-6" data-position="0.21104283665425463m 0.07647062913719621m -0.25155008690059094m" data-normal="-0.06767898938103496m 0.9391840904366718m -0.3366790736992768m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Ruedas delanteras giratorias</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-7" data-position="-0.2520459276549373m 0.49209902603090194m 0.3332633420848593m" data-normal="-0.989392530002313m -0.11667609424937145m -0.08653964759770136m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Ruedas traseras propulsoras</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-9" data-position="-0.001054999205862911m 0.2716771271386193m -0.0356065672817322m" data-normal="0m -1.629206789477422e-7m -0.9999999999999868m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Barras de cruceta</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-11" data-position="-0.24218817026552897m 0.24862377825332332m 0.2010077565139363m" data-normal="-0.3513197061155127m 0.46812780639368634m 0.8108210782755622m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Aros propulsores</div>
-    </button>
-
-    <button class="Hotspot" slot="hotspot-12" data-position="0.220875972918911m 0.1114904312306127m 0.2693615552287887m" data-normal="0.9659263615970368m -0.25881704729771726m 4.2166649068994566e-8m" data-visibility-attribute="visible">
-        <div class="HotspotAnnotation">Barras de inclinación</div>
-    </button>
-
-    <div class="progress-bar hide" slot="progress-bar">
-        <div class="update-bar"></div>
+    <div class="part-counter">
+        <span>Componentes</span>
+        <span class="counter-pill">10 partes</span>
     </div>
-    
-    <button slot="ar-button" id="ar-button">Ver en mi espacio (AR)</button>
 
-</model-viewer>
+    <button class="ar-btn-top" slot="ar-button" id="ar-trigger">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Ver en mi espacio (AR)
+    </button>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+    <!-- 3D VIEWER -->
+    <div class="viewer-wrap">
+        <div class="viewer-hint">🖱️ Haz clic en cualquier punto verde para explorar cada componente</div>
+
+        <model-viewer 
+            id="mv"
+            src="silla.glb" 
+            ar 
+            ar-modes="webxr scene-viewer quick-look" 
+            camera-controls 
+            tone-mapping="neutral" 
+            poster="poster.webp" 
+            shadow-intensity="1"
+            auto-rotate
+            exposure="1.1">
+
+            <button class="Hotspot" slot="hotspot-1" data-position="-0.09332456801273255m 0.12400364438353279m -0.4927209796221662m" data-normal="0m 0.3363381710606559m -0.9417412779992036m" data-visibility-attribute="visible" onclick="openDetail('reposapiés')">
+                <div class="HotspotAnnotation">Reposapiés</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-2" data-position="-0.040418068409104904m 0.4167843732448788m 0.007272002273381373m" data-normal="0.07448182315951603m 0.9972223713990822m -1.5963240223026113e-7m" data-visibility-attribute="visible" onclick="openDetail('asiento')">
+                <div class="HotspotAnnotation">Asiento</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-3" data-position="-0.01257929406573853m 0.6446059689421607m 0.2095687491646194m" data-normal="0.01741564256496317m -3.4541692761645676e-7m -0.9998483361960104m" data-visibility-attribute="visible" onclick="openDetail('respaldo')">
+                <div class="HotspotAnnotation">Respaldo</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-4" data-position="0.22749054791245238m 0.7220691944545161m -0.06611131922087629m" data-normal="0.7132342956414052m 0.7009110125638959m -0.004537839525933149m" data-visibility-attribute="visible" onclick="openDetail('reposabrazos')">
+                <div class="HotspotAnnotation">Reposabrazos</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-5" data-position="0.2292297190985983m 0.8409113687117691m 0.2627824673341663m" data-normal="0.9650503230574928m 0.26206459251770803m 0.00015269301369995818m" data-visibility-attribute="visible" onclick="openDetail('mangos')">
+                <div class="HotspotAnnotation">Mangos de empuje</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-6" data-position="0.21104283665425463m 0.07647062913719621m -0.25155008690059094m" data-normal="-0.06767898938103496m 0.9391840904366718m -0.3366790736992768m" data-visibility-attribute="visible" onclick="openDetail('ruedas-del')">
+                <div class="HotspotAnnotation">Ruedas delanteras</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-7" data-position="-0.2520459276549373m 0.49209902603090194m 0.3332633420848593m" data-normal="-0.989392530002313m -0.11667609424937145m -0.08653964759770136m" data-visibility-attribute="visible" onclick="openDetail('ruedas-tras')">
+                <div class="HotspotAnnotation">Ruedas traseras</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-9" data-position="-0.001054999205862911m 0.2716771271386193m -0.0356065672817322m" data-normal="0m -1.629206789477422e-7m -0.9999999999999868m" data-visibility-attribute="visible" onclick="openDetail('cruceta')">
+                <div class="HotspotAnnotation">Barras de cruceta</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-11" data-position="-0.24218817026552897m 0.24862377825332332m 0.2010077565139363m" data-normal="-0.3513197061155127m 0.46812780639368634m 0.8108210782755622m" data-visibility-attribute="visible" onclick="openDetail('aros')">
+                <div class="HotspotAnnotation">Aros propulsores</div>
+            </button>
+
+            <button class="Hotspot" slot="hotspot-12" data-position="0.220875972918911m 0.1114904312306127m 0.2693615552287887m" data-normal="0.9659263615970368m -0.25881704729771726m 4.2166649068994566e-8m" data-visibility-attribute="visible" onclick="openDetail('inclinacion')">
+                <div class="HotspotAnnotation">Barras de inclinación</div>
+            </button>
+
+        </model-viewer>
+    </div>
+
+    <!-- SIDE PANEL -->
+    <aside class="side-panel">
+        <div class="panel-header">
+            <div class="panel-header-label">Componentes del equipo</div>
+            <h2>Selecciona una parte para<br>conocer su función</h2>
+        </div>
+
+        <div class="parts-list" id="parts-list">
+            <!-- generado por JS -->
+        </div>
+    </aside>
+</div>
+
+<!-- ── DETAIL DRAWER ── -->
+<div class="detail-drawer" id="detail-drawer">
+    <div class="drawer-handle">
+        <div class="drawer-part-name" id="drawer-title">—</div>
+        <button class="close-drawer" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-body">
+        <!-- generado por JS -->
+    </div>
+</div>
+
+<!-- ── STATUS BAR ── -->
+<div class="status-bar">
+    <div class="status-item"><div class="status-dot"></div>Modelo 3D cargado</div>
+    <div class="status-item">10 componentes interactivos</div>
+    <div class="status-selected" id="status-selected">Ningún componente seleccionado</div>
+</div>
+
+<script>
+    const partes = [
+        {
+            id: 'reposapiés',
+            nombre: 'Reposapiés',
+            resumen: 'Soporte para los pies durante el desplazamiento.',
+            funcion: 'Mantiene los pies elevados y seguros mientras la silla está en movimiento. Evita que los pies rocen el suelo o queden en posiciones incómodas.',
+            uso: 'La mayoría son abatibles o extraíbles para facilitar las transferencias (pasar de la silla a una cama o sillón). Se ajustan en altura para adaptarse a cada usuario.',
+            consejo: 'Los pies deben apoyarse completamente en la plataforma. Si quedan en el aire o forzados, puede afectar la circulación y generar tensión en las rodillas.'
+        },
+        {
+            id: 'asiento',
+            nombre: 'Asiento',
+            resumen: 'Base donde se sienta el usuario.',
+            funcion: 'Distribuye el peso corporal del usuario durante el uso de la silla. Su profundidad y anchura determinan el confort y la postura del usuario.',
+            uso: 'Debe elegirse según las medidas corporales del usuario: la distancia entre la parte trasera de la rodilla y la espalda determina la profundidad ideal.',
+            consejo: 'Un asiento muy blando puede causar mala postura y úlceras por presión. Se recomienda usar cojines antiescaras si el usuario pasa más de 4 horas al día en la silla.'
+        },
+        {
+            id: 'respaldo',
+            nombre: 'Respaldo',
+            resumen: 'Soporte para la espalda y la postura.',
+            funcion: 'Proporciona apoyo a la columna vertebral, previniendo la fatiga postural y la escoliosis. Su altura varía según el nivel de soporte que necesita el usuario.',
+            uso: 'Respaldos bajos permiten mayor libertad de movimiento para quienes propulsan la silla de forma independiente. Respaldos altos ofrecen soporte adicional para quienes lo necesitan.',
+            consejo: 'Un respaldo inclinado hacia atrás mejora la estabilidad. Algunos modelos incluyen almohadillas laterales para usuarios con control postural reducido.'
+        },
+        {
+            id: 'reposabrazos',
+            nombre: 'Reposabrazos',
+            resumen: 'Apoyo para los brazos y ayuda en transferencias.',
+            funcion: 'Soportan los brazos durante el desplazamiento y sirven de punto de apoyo al levantarse o sentarse (transferencias). También ayudan a mantener la postura lateral.',
+            uso: 'Los reposabrazos abatibles o extraíbles facilitan mucho las transferencias laterales (pasar de la silla a una cama). Pueden regularse en altura según la estatura del usuario.',
+            consejo: 'La altura ideal es aquella en la que los codos quedan ligeramente flexionados y los hombros relajados. Si están muy altos o bajos, causan tensión cervical.'
+        },
+        {
+            id: 'mangos',
+            nombre: 'Mangos de empuje',
+            resumen: 'Permiten que otra persona conduzca la silla.',
+            funcion: 'Son los puntos donde un asistente o cuidador empuja la silla. Están ubicados en la parte superior trasera del respaldo para una postura ergonómica del asistente.',
+            uso: 'Algunos modelos incluyen frenos de asistente integrados en los mangos, permitiendo al cuidador controlar la velocidad al bajar rampas de forma segura.',
+            consejo: 'Si el asistente tiene que encorvarse para alcanzarlos, los mangos son demasiado bajos. Existen extensores de mangos para cuidadores de mayor estatura.'
+        },
+        {
+            id: 'ruedas-del',
+            nombre: 'Ruedas delanteras giratorias',
+            resumen: 'Permiten los giros y la maniobra en espacios pequeños.',
+            funcion: 'Son ruedas pequeñas de giro libre (360°) ubicadas en la parte delantera. Su función principal es la dirección: permiten girar y maniobrar con precisión.',
+            uso: 'En terrenos irregulares, pueden bloquearse hacia adelante para evitar que se encajen en grietas. Diámetros más grandes mejoran el paso sobre obstáculos.',
+            consejo: 'Si las ruedas delanteras tiemblan o vibran a cierta velocidad, es momento de revisarlas. Una alineación incorrecta dificulta la conducción y genera mayor esfuerzo.'
+        },
+        {
+            id: 'ruedas-tras',
+            nombre: 'Ruedas traseras propulsoras',
+            resumen: 'Las ruedas principales que impulsan la silla.',
+            funcion: 'Son las ruedas grandes del eje trasero. Son el elemento de propulsión principal: el usuario las mueve girando los aros propulsores para desplazarse.',
+            uso: 'Su diámetro (normalmente 24 pulgadas) condiciona la facilidad de propulsión. Ruedas más grandes permiten mayor velocidad con menos esfuerzo y mejor estabilidad.',
+            consejo: 'La presión correcta del neumático (si no son de goma sólida) mejora drásticamente la facilidad de propulsión y la protección contra vibraciones.'
+        },
+        {
+            id: 'cruceta',
+            nombre: 'Barras de cruceta',
+            resumen: 'Estructura central que permite plegar la silla.',
+            funcion: 'Es el corazón mecánico de las sillas plegables. El sistema de cruceta en "X" permite doblar la silla lateralmente para transportarla o guardarla en poco espacio.',
+            uso: 'Para plegar: se levantan los reposapiés, se jala hacia arriba el asiento desde el centro y las barras colapsan. Para abrir: se presiona hacia abajo en los laterales del asiento.',
+            consejo: 'Revisar periódicamente los tornillos y pasadores de la cruceta. Una cruceta holgada afecta la estabilidad lateral de la silla y genera ruidos molestos.'
+        },
+        {
+            id: 'aros',
+            nombre: 'Aros propulsores',
+            resumen: 'Anillos que permiten propulsar la silla de forma independiente.',
+            funcion: 'Son los aros metálicos (o de material antideslizante) fijados a las ruedas traseras. El usuario los agarra y empuja hacia adelante para moverse sin ayuda de otra persona.',
+            uso: 'El diámetro del aro es ligeramente menor que el de la rueda. Aros más finos requieren más agarre, los más gruesos o con recubrimiento de goma son más cómodos para propulsión prolongada.',
+            consejo: 'La técnica correcta es: agarrar el aro, empujar hacia adelante describiendo un arco y soltar. Evitar agarrar constantemente el aro — esto causa lesiones en muñecas y hombros.'
+        },
+        {
+            id: 'inclinacion',
+            nombre: 'Barras de inclinación',
+            resumen: 'Permiten inclinar la silla hacia atrás de forma segura.',
+            funcion: 'Son las barras o pequeñas plataformas situadas en la parte trasera inferior. Permiten que el asistente incline la silla hacia atrás levantando las ruedas delanteras para subir bordillos o escalones.',
+            uso: 'El asistente presiona con el pie hacia abajo y simultáneamente tira de los mangos, inclinando la silla para superar un obstáculo. Fundamental en entornos urbanos.',
+            consejo: 'No se recomienda que el usuario intente hacer este movimiento solo en sillas estándar. La inclinación debe ser controlada y breve para no perder el equilibrio.'
+        }
+    ];
+
+    // Build parts list
+    const list = document.getElementById('parts-list');
+    partes.forEach((p, i) => {
+        const item = document.createElement('div');
+        item.className = 'part-item';
+        item.id = 'item-' + p.id;
+        item.innerHTML = `
+            <div class="part-num">${i + 1}</div>
+            <div class="part-info">
+                <div class="part-name">${p.nombre}</div>
+                <div class="part-summary">${p.resumen}</div>
+            </div>
+            <div class="part-arrow">›</div>
+        `;
+        item.onclick = () => openDetail(p.id);
+        list.appendChild(item);
+    });
+
+    let currentPart = null;
+
+    function openDetail(id) {
+        const p = partes.find(x => x.id === id);
+        if (!p) return;
+
+        // Mark active in list
+        document.querySelectorAll('.part-item').forEach(el => el.classList.remove('activo'));
+        const listItem = document.getElementById('item-' + id);
+        if (listItem) {
+            listItem.classList.add('activo');
+            listItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Update drawer
+        document.getElementById('drawer-title').textContent = p.nombre;
+        document.getElementById('status-selected').textContent = '📍 ' + p.nombre;
+
+        const body = document.getElementById('drawer-body');
+        body.innerHTML = `
+            <div class="detail-card highlight">
+                <div class="detail-card-label">🔍 ¿Qué hace?</div>
+                <p>${p.funcion}</p>
+            </div>
+            <div class="detail-card">
+                <div class="detail-card-label">⚙️ ¿Cómo se usa?</div>
+                <p>${p.uso}</p>
+            </div>
+            <div class="detail-card">
+                <div class="detail-card-label">✅ Consejo clave</div>
+                <p>${p.consejo}</p>
+            </div>
+        `;
+
+        document.getElementById('detail-drawer').classList.add('open');
+        currentPart = id;
+    }
+
+    function closeDetail() {
+        document.getElementById('detail-drawer').classList.remove('open');
+        document.querySelectorAll('.part-item').forEach(el => el.classList.remove('activo'));
+        document.getElementById('status-selected').textContent = 'Ningún componente seleccionado';
+        currentPart = null;
+    }
+
+    // AR button passthrough
+    document.getElementById('ar-trigger').addEventListener('click', () => {
+        document.getElementById('mv').activateAR?.();
+    });
+</script>
 
 </body>
 </html>
